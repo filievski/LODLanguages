@@ -23,7 +23,6 @@ parser.parse(stream, function(){
 		var litvalue=N3Util.getLiteralValue(docobj);
 		allLines++;
 
-                fs.appendFile('hello.txt', litvalue + "\n", function (err){});
 		if (litvalue.match(regex)) {
 			nums++;
 		} else { 
