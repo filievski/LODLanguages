@@ -8,10 +8,12 @@ var stream = byline.createStream(process.stdin);
 //var cld=require('cld');
 //var tika=require('tika');
 var request = require('request');
-
+var streamFinished = false;
 var regex = /^[-\.,0-9]*$/;
 var nums=0;
+var pendingRequests = 0;
 var def=0, undef=0;
+var allLines=0;
 var undef_solved=0, undef_unsolved=0, def_unsolved=0, def_solved_good=0, def_solved_bad=0;
 docid=process.argv[2];
 parser.parse(stream, function(){
@@ -19,24 +21,33 @@ parser.parse(stream, function(){
                 var doc = arguments['1'];
 		var docobj=doc["object"];
 		var litvalue=N3Util.getLiteralValue(docobj);
-		if (litvalue.match(regex))
+		allLines++;
+
+                fs.appendFile('hello.txt', litvalue + "\n", function (err){});
+		if (litvalue.match(regex)) {
 			nums++;
-		else { 
+		} else { 
+			pendingRequests++;
 			if (N3Util.getLiteralLanguage(docobj)){ //Defined
                                 request({url: 'http://localhost:9200/_langdetect', method: 'POST', form: {data: N3Util.getLiteralValue(docobj), profile: '/langdetect/short-text/'}}, function(err, response, body) {
+					pendingRequests--;
 					def++;
 					var bodyjson = JSON.parse(body);
 					if (err || !bodyjson["languages"] || !bodyjson["languages"][0] || !bodyjson["languages"][0]["language"])
 						def_unsolved++;
 					else{
 						if (bodyjson["languages"][0]["language"]==N3Util.getLiteralLanguage(docobj).substring(0,2).toLowerCase())
+						{
 							def_solved_good++;
-						else
+						} else {
 							def_solved_bad++;
+						}
 					}
+					if (streamFinished && pendingRequests == 0) writeLog();
 				});
 			} else {
 				request({url: 'http://localhost:9200/_langdetect', method: 'POST', form: {data: N3Util.getLiteralValue(docobj), profile: '/langdetect/short-text/'}}, function(err, response, body) {
+					pendingRequests--;
 					undef++;
 				        var bodyjson = JSON.parse(body);
 					if (!err && bodyjson["languages"] && bodyjson["languages"][0] && bodyjson["languages"][0]["language"]){
@@ -44,18 +55,25 @@ parser.parse(stream, function(){
 					} else {
 						undef_unsolved++;
 					}
+                                        if (streamFinished && pendingRequests == 0) writeLog();
 				});
 			}
 		}
 	} else{
-		fs.appendFile('es_lang_logs.txt', def.toString() + "\t" + def_solved_good.toString() + "\t" + def_solved_bad.toString() + "\t" + def_unsolved.toString() + "\t" + undef.toString() + "\t" + undef_solved.toString() + "\t" + undef_unsolved.toString() + "\n", function (err){
-		});
+		streamFinished=true;
+		if (pendingRequests == 0) writeLog();
 	//	console.log("End of file: Solved, unsolved, defined...");
 	//	console.log(solved);
 	//	console.log(unsolved);
 	//	console.log(defined);
 	}
 });
+
+var writeLog = function(){
+	fs.appendFile('es_lang_logs.txt', def.toString() + "\t" + def_solved_good.toString() + "\t" + def_solved_bad.toString() + "\t" + def_unsolved.toString() + "\t" + undef.toString() + "\t" + undef_solved.toString() + "\t" + undef_unsolved.toString() + "\t" + nums.toString() + "\t" + allLines.toString() + "\n", function (err){
+	});
+
+}
 
 console.log(docid);
 
