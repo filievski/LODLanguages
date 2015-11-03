@@ -16,6 +16,8 @@ var def=0, undef=0;
 var allLines=0;
 var undef_solved=0, undef_unsolved=0, def_unsolved=0, def_solved_good=0, def_solved_bad=0;
 docid=process.argv[2];
+var port=process.argv[3];
+var url='http://localhost:' + port + '/_langdetect';
 parser.parse(stream, function(){
         if (arguments['1']) {
                 var doc = arguments['1'];
@@ -28,7 +30,7 @@ parser.parse(stream, function(){
 		} else { 
 			pendingRequests++;
 			if (N3Util.getLiteralLanguage(docobj)){ //Defined
-                                request({url: 'http://localhost:9200/_langdetect', method: 'POST', form: {data: N3Util.getLiteralValue(docobj), profile: '/langdetect/short-text/'}}, function(err, response, body) {
+                                request({url: url, method: 'POST', form: {data: N3Util.getLiteralValue(docobj), profile: '/langdetect/short-text/'}}, function(err, response, body) {
 					pendingRequests--;
 					def++;
 					var bodyjson = JSON.parse(body);
@@ -45,7 +47,7 @@ parser.parse(stream, function(){
 					if (streamFinished && pendingRequests == 0) writeLog();
 				});
 			} else {
-				request({url: 'http://localhost:9200/_langdetect', method: 'POST', form: {data: N3Util.getLiteralValue(docobj), profile: '/langdetect/short-text/'}}, function(err, response, body) {
+				request({url: url, method: 'POST', form: {data: N3Util.getLiteralValue(docobj), profile: '/langdetect/short-text/'}}, function(err, response, body) {
 					pendingRequests--;
 					undef++;
 				        var bodyjson = JSON.parse(body);

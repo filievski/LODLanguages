@@ -1,10 +1,6 @@
 #!/bin/bash
 
-./es_run.sh ab &
-./es_run.sh cd &
-./es_run.sh ef &
-./es_run.sh 01 &
-./es_run.sh 23 &
-./es_run.sh 45 &
-./es_run.sh 67 &
-./es_run.sh 89 &
+./es_run.sh abcd 9200 &
+./es_run.sh ef89 9201 &
+./es_run.sh 0123 9202 &
+./es_run.sh 5667 9203 &
