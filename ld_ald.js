@@ -61,7 +61,6 @@ DetectorFactory.loadProfile("langdetect-03-03-2014/profiles.sm", function(err, r
                                                                 pendingRequests--;
                                                                 if (err || !r) undef_unsolved++;
                                                                 else undef_solved++;
-								console.log(r);
                                                                 if (streamFinished && pendingRequests == 0) writeLog();
                                                         });
                                                 });

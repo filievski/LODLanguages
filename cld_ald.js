@@ -32,7 +32,7 @@ parser.parse(stream, function(){
 					if (!result || !result["languages"]["0"])
 						def_unsolved++;
 					else{
-						if (result["languages"]["0"]["code"]==N3Util.getLiteralLanguage(docobj).substring(0,2).toLowerCase())
+						if (result["languages"]["0"]["code"].substring(0,2).toLowerCase()==N3Util.getLiteralLanguage(docobj).substring(0,2).toLowerCase())
 							def_solved_good++;
 						else
 							def_solved_bad++;
