@@ -13,9 +13,7 @@ var stream = byline.createStream(process.stdin);
 var docs=[];
 var streamFinished = false;
 var regex = /^[-\.,0-9]*$/;
-var nums=0;
 var pendingRequests=0;
-var allLines=0;
 docid=process.argv[2];
 
 comp = 'ld_compatibility_' + docid + '.json';
@@ -29,7 +27,6 @@ DetectorFactory.loadProfile("langdetect-03-03-2014/profiles.sm", function(err, r
 				var doc = arguments['1'];
 				var docobj=doc["object"];
 				var datatype = N3Util.getLiteralType(docobj);
-				allLines++;
 				if (!N3Util.getLiteralValue(docobj).match(regex)){
 					pendingRequests++;
 					if (N3Util.getLiteralLanguage(docobj)){ //Defined
