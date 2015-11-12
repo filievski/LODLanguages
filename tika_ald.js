@@ -33,7 +33,7 @@ parser.parse(stream, function(){
 					if (err || !language)
 						def_unsolved++;
 					else{
-						if (language==N3Util.getLiteralLanguage(docobj).substring(0,2).toLowerCase())
+						if (language.substring(0,2).toLowerCase()==N3Util.getLiteralLanguage(docobj).substring(0,2).toLowerCase())
 							def_solved_good++;
 						else
 							def_solved_bad++;
@@ -64,7 +64,7 @@ parser.parse(stream, function(){
 });
 
 var writeLog = function(){
-	fs.appendFile('es_lang_logs.txt', def.toString() + "\t" + def_solved_good.toString() + "\t" + def_solved_bad.toString() + "\t" + def_unsolved.toString() + "\t" + undef.toString() + "\t" + undef_solved.toString() + "\t" + undef_unsolved.toString() + "\t" + nums.toString() + "\t" + allLines.toString() + "\n", function (err){
+	fs.appendFile('tika_lang_logs.txt', def.toString() + "\t" + def_solved_good.toString() + "\t" + def_solved_bad.toString() + "\t" + def_unsolved.toString() + "\t" + undef.toString() + "\t" + undef_solved.toString() + "\t" + undef_unsolved.toString() + "\t" + nums.toString() + "\t" + allLines.toString() + "\n", function (err){
 	});
 
 }
