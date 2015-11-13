@@ -10,9 +10,22 @@ var math=require('mathjs');
 var stream = byline.createStream(process.stdin);
 var docs=[];
 var streamFinished = false;
-var regex = /^[-\.,0-9]*$/;
 var pendingRequests=0;
 docid=process.argv[2];
+
+var category = require('unicode-7.0.0/categories');
+var isNLS = function(s){
+        var consecutive=0
+	if (s.length<2) return false;
+        for (var i = 0, len=s.length; i<len; i++) {
+                if(category[ s.charCodeAt(i) ][0]=="L") {
+                        if (++consecutive==2) return true;
+                } else {
+                        consecutive=0;
+                }
+                if (i==len-1) return false;
+        }
+}
 
 comp = 'cld_compatibility_' + docid + '.json';
 jsonfile.readFile(comp, function (err, data) {
@@ -22,10 +35,10 @@ jsonfile.readFile(comp, function (err, data) {
 		if (arguments['1']) {
 			var doc = arguments['1'];
 			var docobj=doc["object"];
-                        if (!N3Util.getLiteralValue(docobj).match(regex)){
+                        var datatype = N3Util.getLiteralType(docobj);
+                        if ((datatype=="http://www.w3.org/2001/XMLSchema#string" || datatype=="http://www.w3.org/1999/02/22-rdf-syntax-ns#langString") && isNLS(N3Util.getLiteralValue(docobj))){
 				pendingRequests++;
                                 if (N3Util.getLiteralLanguage(docobj)){ //Defined
-					console.log("holla");
 					cld.detect(N3Util.getLiteralValue(docobj), function(err, result) {
 						var newdoc={};
 

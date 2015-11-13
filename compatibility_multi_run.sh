@@ -2,7 +2,11 @@
 
 #./setup_stuff.sh
 
-./compatibility_run.sh abcd &
-./compatibility_run.sh ef01 &
-./compatibility_run.sh 2345 &
-./compatibility_run.sh 6789 &
+./compatibility_run.sh ab &
+./compatibility_run.sh cf &
+./compatibility_run.sh 23 &
+./compatibility_run.sh 67 &
+./compatibility_run.sh de &
+./compatibility_run.sh 01 &
+./compatibility_run.sh 45 &
+./compatibility_run.sh 89 &
