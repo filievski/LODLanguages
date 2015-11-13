@@ -8,20 +8,19 @@ var fs = require('fs');
 var byline = require('byline');
 var stream = byline.createStream(process.stdin);
 var cld=require('cld');
-var tika=require('tika');
+var math=require('mathjs');
 var streamFinished = false;
 var nums=0;
 var pendingRequests=0;
 
-
-var initArray(){
+var initArray = function(){
 	var arr={};
         for (var i=0; i<=20; i++){
                 arr[i.toString()]=0;
         }
 	return arr;
 }
-var cld_undef_solved=initArray(), ld_undef_solved=initArray(), tika_undef_solved=initArray();
+var cld_undef_solved=initArray(), ld_undef_solved=initArray(), all_undef_solved=initArray();
 docid=process.argv[2];
 
 var category = require('unicode-7.0.0/categories');
@@ -49,7 +48,7 @@ DetectorFactory.loadProfile("langdetect-03-03-2014/profiles.sm", function(err, r
                         var datatype = N3Util.getLiteralType(docobj);
                         if ((datatype=="http://www.w3.org/2001/XMLSchema#string" || datatype=="http://www.w3.org/1999/02/22-rdf-syntax-ns#langString") && isNLS(litvalue)){
 				nums++;
-			else { 
+			} else { 
 				if (!N3Util.getLiteralLanguage(docobj)){ //Defined
 					pendingRequests++;
 					cld.detect(N3Util.getLiteralValue(docobj), function(err, result) {
@@ -59,15 +58,9 @@ DetectorFactory.loadProfile("langdetect-03-03-2014/profiles.sm", function(err, r
 							detector.append(N3Util.getLiteralValue(docobj), function(err, o){
 								detector.detect(function(err, r){
 									if (!err && r) ld_undef_solved[wordlog_s]++;
-									tika.language(N3Util.getLiteralValue(docobj), function(err, language, reasonablyCertain) {
-										pendingRequests--;
-										if (!err && language){
-											tika_undef_solved[wordlog_s]++;
-										}
- 										
-										if (streamFinished && pendingRequests == 0) writeLog();
-									});
-
+									all_undef_solved[wordlog_s]++;
+									pendingRequests--;
+									if (streamFinished && pendingRequests == 0) writeLog();
                                                         	});
                                                 	});
                                         	});
@@ -86,20 +79,21 @@ DetectorFactory.loadProfile("langdetect-03-03-2014/profiles.sm", function(err, r
 });
 
 var printArray = function(arr, fn){
-	var toPrint="";
+	var toPrint=nums + "\t";
 	for (var i=0; i<=20; i++){
 		toPrint += arr[i.toString()] + "\t";
 	}
 	toPrint += "\n";
 	fs.appendFile(fn, toPrint, function(err){
-                fs.appendFile("write_errors.log", docid + "\n", function(err){});
+		if (err)
+                	fs.appendFile("write_errors.log", docid + "\n", function(err){});
 	})
 }
 
 var writeLog = function(){
 	printArray(cld_undef_solved, 'cld_untagged.csv');
 	printArray(ld_undef_solved, 'ld_untagged.csv');
-	printArray(tika_undef_solved, 'tika_untagged.csv');
+	printArray(all_undef_solved, 'tika_untagged.csv');
 }
 
 console.log(docid);

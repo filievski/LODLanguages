@@ -3,4 +3,5 @@ Frank/
 *.log
 *.txt
 *.json
+*.csv
 node_modules/
