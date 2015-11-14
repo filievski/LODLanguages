@@ -9,6 +9,8 @@ var nums=0;
 var processFinished=false;
 var pendingRequests=0;
 
+var docid = process.argv[2];
+
 var initArray = function(){
 	var arr={};
         for (var i=0; i<=20; i++){
@@ -39,15 +41,19 @@ parser.parse(stream, function(){
 		var docobj=doc["object"];
 		var litvalue=N3Util.getLiteralValue(docobj);
 		var datatype = N3Util.getLiteralType(docobj);
-		if ((datatype!="http://www.w3.org/2001/XMLSchema#string" && datatype!="http://www.w3.org/1999/02/22-rdf-syntax-ns#langString") || !isNLS(litvalue)){
-			pendingRequests++;
+		pendingRequests++;
+		if ((datatype=="http://www.w3.org/2001/XMLSchema#string" || datatype=="http://www.w3.org/1999/02/22-rdf-syntax-ns#langString") && isNLS(litvalue)){
 			if (!N3Util.getLiteralLanguage(docobj)){ //Defined
 				var wordlog_s = math.min(20, parseInt(math.log(litvalue.split(' ').length, 2), 10)).toString();
 				all_undef[wordlog_s]++;
 				pendingRequests--;
 				if (pendingRequests==0 && processFinished) writeLog();
 			}
-		} else nums++;
+		} else {
+			nums++;
+			pendingRequests--;
+                        if (pendingRequests==0 && processFinished) writeLog();
+		}
 	} else{
 		processFinished=true;
 		if (pendingRequests==0) writeLog();
@@ -59,7 +65,7 @@ var writeLog = function(){
 	for (var i=0; i<=20; i++){
 		toPrint += all_undef[i.toString()] + "\t";
 	}
-	toPrint += nums + "\n";
+	toPrint += nums + "\t" + docid + "\n";
 	fs.appendFile('all_untagged.csv', toPrint, function(err){
 		if (err)
                 	fs.appendFile("write_errors.log", "Error\n", function(err){});

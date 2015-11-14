@@ -39,14 +39,14 @@ parser.parse(stream, function(){
 		var docobj=doc["object"];
 		var litvalue=N3Util.getLiteralValue(docobj);
 		var datatype = N3Util.getLiteralType(docobj);
-		if ((datatype!="http://www.w3.org/2001/XMLSchema#string" && datatype!="http://www.w3.org/1999/02/22-rdf-syntax-ns#langString") || !isNLS(litvalue)){
+		if ((datatype=="http://www.w3.org/2001/XMLSchema#string" || datatype=="http://www.w3.org/1999/02/22-rdf-syntax-ns#langString") && isNLS(litvalue)){
 			if (!N3Util.getLiteralLanguage(docobj)){ //Defined
 				pendingRequests++;
 				cld.detect(litvalue, function(err, result) {
 					var wordlog_s = math.min(20, parseInt(math.log(litvalue.split(' ').length, 2), 10)).toString();
 					if (result && result["languages"][0]) cld_undef_solved[wordlog_s]++;
 					pendingRequests--;
-					if (streamFinished && pendingRequests == 0) writeLog();		
+					if (streamFinished && pendingRequests == 0) writeLog();
 				});
 			}
 		}
