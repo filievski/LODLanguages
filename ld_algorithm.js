@@ -30,96 +30,93 @@ var isNLS = function(s){
 }
 
 
-comp = 'ld_compatibility_' + docid + '.json';
+comp = 'ld/' + docid + '.json';
 var DetectorFactory = java.import('com.cybozu.labs.langdetect.DetectorFactory')
 DetectorFactory.loadProfile("langdetect-03-03-2014/profiles.sm", function(err, rslt){
-	jsonfile.readFile(comp, function (err, data) {
-		if (!data)
-	                data={"tagged":{}, "untagged": {}};
-		parser.parse(stream, function(){
-			if (arguments['1']) {
-				var doc = arguments['1'];
-				var docobj=doc["object"];
-	                        var litvalue = N3Util.getLiteralValue(docobj);
-				var datatype = N3Util.getLiteralType(docobj);
-                        	if ((datatype=="http://www.w3.org/2001/XMLSchema#string" || datatype=="http://www.w3.org/1999/02/22-rdf-syntax-ns#langString") && isNLS(litvalue)){
-					pendingRequests++;
-					if (N3Util.getLiteralLanguage(docobj)){ //Defined
-                                                DetectorFactory.create(function(err, detector){
-                                                        if (err) console.log(err);
-                                                        detector.append(litvalue, function(err, o){
-                                                                detector.detect(function(err, r){
+	data={"tagged":{}, "untagged": {}};
+	parser.parse(stream, function(){
+		if (arguments['1']) {
+			var doc = arguments['1'];
+			var docobj=doc["object"];
+			var litvalue = N3Util.getLiteralValue(docobj);
+			var datatype = N3Util.getLiteralType(docobj);
+			if ((datatype=="http://www.w3.org/2001/XMLSchema#string" || datatype=="http://www.w3.org/1999/02/22-rdf-syntax-ns#langString") && isNLS(litvalue)){
+				pendingRequests++;
+				if (N3Util.getLiteralLanguage(docobj)){ //Defined
+					DetectorFactory.create(function(err, detector){
+						if (err) console.log(err);
+						detector.append(litvalue, function(err, o){
+							detector.detect(function(err, r){
 
-									var newdoc={};
+								var newdoc={};
 
-									var langtag=N3Util.getLiteralLanguage(docobj).substring(0,2).toLowerCase();
+								var langtag=N3Util.getLiteralLanguage(docobj).substring(0,2).toLowerCase();
 
-									var wordlog = parseInt(math.log(N3Util.getLiteralValue(docobj).split(' ').length, 2), 10);
+								var wordlog = parseInt(math.log(N3Util.getLiteralValue(docobj).split(' ').length, 2), 10);
 
-                                                                	if (!err && r) {
-										var compatible = (r.substring(0,2).toLowerCase()==langtag);
-										if (compatible){
-											c="c";
-										} else{
-											c="i";
-										}
-										var wlogstr = wordlog.toString();
-										 if (data["tagged"][langtag] && data["tagged"][langtag][wlogstr] && data["tagged"][langtag][wlogstr][c])
-										{
-											data["tagged"][langtag][wlogstr][c]++;
-										} else{
-											if (data["tagged"][langtag] && data["tagged"][langtag][wlogstr]){
-												data["tagged"][langtag][wlogstr][c]=1;
-											} else if (data["tagged"][langtag]){
-												data["tagged"][langtag][wlogstr]={};
-												data["tagged"][langtag][wlogstr][c]=1;
-											} else{
-												data["tagged"][langtag]={};
-												data["tagged"][langtag][wlogstr]={};
-												data["tagged"][langtag][wlogstr][c]=1;
-											}
-										}
-
+								if (!err && r) {
+									var compatible = (r.substring(0,2).toLowerCase()==langtag);
+									if (compatible){
+										c="c";
+									} else{
+										c="i";
 									}
-									pendingRequests--;
-									if (streamFinished && pendingRequests == 0) {
-										jsonfile.writeFile(comp, data, function (err) {
-										})
+									var wlogstr = wordlog.toString();
+									 if (data["tagged"][langtag] && data["tagged"][langtag][wlogstr] && data["tagged"][langtag][wlogstr][c])
+									{
+										data["tagged"][langtag][wlogstr][c]++;
+									} else{
+										if (data["tagged"][langtag] && data["tagged"][langtag][wlogstr]){
+											data["tagged"][langtag][wlogstr][c]=1;
+										} else if (data["tagged"][langtag]){
+											data["tagged"][langtag][wlogstr]={};
+											data["tagged"][langtag][wlogstr][c]=1;
+										} else{
+											data["tagged"][langtag]={};
+											data["tagged"][langtag][wlogstr]={};
+											data["tagged"][langtag][wlogstr][c]=1;
+										}
 									}
-								});
 
+								}
+								pendingRequests--;
+								if (streamFinished && pendingRequests == 0) {
+									jsonfile.writeFile(comp, data, function (err) {
+									})
+								}
+							});
+
+						});
+					});
+				} else {
+					DetectorFactory.create(function(err, detector){
+						if (err) console.log(err);
+						detector.append(litvalue, function(err, o){
+							detector.detect(function(err, r){
+								var wordlog_s = math.min(20, parseInt(math.log(litvalue.split(' ').length, 2), 10)).toString();
+								if (!err && r) {
+									if (data["untagged"][wordlog_s])
+										data["untagged"][wordlog_s]++;
+									else
+										data["untagged"][wordlog_s]=1;
+								}
+
+								pendingRequests--;
+								if (streamFinished && pendingRequests == 0) {
+									jsonfile.writeFile(comp, data, function (err) {
+									})
+								}  
 							});
 						});
-					} else {
-                                                DetectorFactory.create(function(err, detector){
-                                                        if (err) console.log(err);
-                                                        detector.append(litvalue, function(err, o){
-                                                                detector.detect(function(err, r){
-									var wordlog_s = math.min(20, parseInt(math.log(litvalue.split(' ').length, 2), 10)).toString();
-									if (!err && r) {
-										if (data["untagged"][wordlog_s])
-											data["untagged"][wordlog_s]++;
-										else
-											data["untagged"][wordlog_s]=1;
-									}
-
-									pendingRequests--;
-									if (streamFinished && pendingRequests == 0) {
-										jsonfile.writeFile(comp, data, function (err) {
-										})
-									}  
-								});
-							});
-						});
-					}
-				} 
-			} else {
-				streamFinished=true;
-				if (pendingRequests==0) {
-					jsonfile.writeFile(comp, data, function (err) {
-					})
+					});
 				}
+			} 
+		} else {
+			streamFinished=true;
+			if (pendingRequests==0) {
+				jsonfile.writeFile(comp, data, function (err) {
+				})
 			}
-		});
-	})
+		}
+	});
 });

@@ -27,82 +27,79 @@ var isNLS = function(s){
         }
 }
 
-comp = 'tika_compatibility_' + docid + '.json';
-jsonfile.readFile(comp, function (err, data) {
-	if (!data)
-		data={"tagged":{}, "untagged":{}};
-	parser.parse(stream, function(){
-		if (arguments['1']) {
-			var doc = arguments['1'];
-			var docobj=doc["object"];
-			var datatype = N3Util.getLiteralType(docobj);
-			var litvalue = N3Util.getLiteralValue(docobj);
-                        if ((datatype=="http://www.w3.org/2001/XMLSchema#string" || datatype=="http://www.w3.org/1999/02/22-rdf-syntax-ns#langString") && isNLS(litvalue)){
-				pendingRequests++;
-                                if (N3Util.getLiteralLanguage(docobj)){ //Defined
-					tika.language(litvalue, function(err, language, reasonablyCertain) {
-						var newdoc={};
+comp = 'tika/' + docid + '.json';
+data={"tagged":{}, "untagged":{}};
+parser.parse(stream, function(){
+	if (arguments['1']) {
+		var doc = arguments['1'];
+		var docobj=doc["object"];
+		var datatype = N3Util.getLiteralType(docobj);
+		var litvalue = N3Util.getLiteralValue(docobj);
+		if ((datatype=="http://www.w3.org/2001/XMLSchema#string" || datatype=="http://www.w3.org/1999/02/22-rdf-syntax-ns#langString") && isNLS(litvalue)){
+			pendingRequests++;
+			if (N3Util.getLiteralLanguage(docobj)){ //Defined
+				tika.language(litvalue, function(err, language, reasonablyCertain) {
+					var newdoc={};
 
-						var langtag=N3Util.getLiteralLanguage(docobj).substring(0,2).toLowerCase();
+					var langtag=N3Util.getLiteralLanguage(docobj).substring(0,2).toLowerCase();
 
-						var wordlog = parseInt(math.log(litvalue.split(' ').length, 2), 10);
-						if (!err && language){
-							var compatible = (language==langtag);
-							if (compatible){
-								c="c";
+					var wordlog = parseInt(math.log(litvalue.split(' ').length, 2), 10);
+					if (!err && language){
+						var compatible = (language==langtag);
+						if (compatible){
+							c="c";
+						} else{
+							c="i";
+						}
+						var wlogstr = wordlog.toString();
+
+						if (data["tagged"][langtag] && data["tagged"][langtag][wlogstr] && data["tagged"][langtag][wlogstr][c])
+						{	
+							data["tagged"][langtag][wlogstr][c]++;
+						} else {	
+							if (data["tagged"][langtag] && data["tagged"][langtag][wlogstr]){
+								data["tagged"][langtag][wlogstr][c]=1;	
+							} else if (data["tagged"][langtag]){
+								data["tagged"][langtag][wlogstr]={};
+								data["tagged"][langtag][wlogstr][c]=1;
 							} else{
-								c="i";
-							}
-							var wlogstr = wordlog.toString();
-
-							if (data["tagged"][langtag] && data["tagged"][langtag][wlogstr] && data["tagged"][langtag][wlogstr][c])
-							{	
-								data["tagged"][langtag][wlogstr][c]++;
-							} else {	
-								if (data["tagged"][langtag] && data["tagged"][langtag][wlogstr]){
-									data["tagged"][langtag][wlogstr][c]=1;	
-								} else if (data["tagged"][langtag]){
-									data["tagged"][langtag][wlogstr]={};
-									data["tagged"][langtag][wlogstr][c]=1;
-								} else{
-									data["tagged"][langtag]={};
-									data["tagged"][langtag][wlogstr]={};
-									data["tagged"][langtag][wlogstr][c]=1;
-								}
-							}
-
-							pendingRequests--;
-                                                        if (streamFinished && pendingRequests == 0) {
-                                				jsonfile.writeFile(comp, data, function (err) {
-                                				})
+								data["tagged"][langtag]={};
+								data["tagged"][langtag][wlogstr]={};
+								data["tagged"][langtag][wlogstr][c]=1;
 							}
 						}
-					});
-				} else {
-                                        tika.language(litvalue, function(err, language, reasonablyCertain) {
-						if (!err && language){
-                                                        var wordlog_s = math.min(20, parseInt(math.log(litvalue.split(' ').length, 2), 10)).toString();
-							
-							if (data["untagged"][wordlog_s])
-                                                                data["untagged"][wordlog_s]++;
-                                                        else
-                                                                data["untagged"][wordlog_s]=1;
-						}
+
 						pendingRequests--;
 						if (streamFinished && pendingRequests == 0) {
 							jsonfile.writeFile(comp, data, function (err) {
 							})
 						}
+					}
+				});
+			} else {
+				tika.language(litvalue, function(err, language, reasonablyCertain) {
+					if (!err && language){
+						var wordlog_s = math.min(20, parseInt(math.log(litvalue.split(' ').length, 2), 10)).toString();
+						
+						if (data["untagged"][wordlog_s])
+							data["untagged"][wordlog_s]++;
+						else
+							data["untagged"][wordlog_s]=1;
+					}
+					pendingRequests--;
+					if (streamFinished && pendingRequests == 0) {
+						jsonfile.writeFile(comp, data, function (err) {
+						})
+					}
 
-					});
-				}
-			} 
-		} else {
-			streamFinished=true;
-			if (pendingRequests==0) {
-				jsonfile.writeFile(comp, data, function (err) {
-				})
+				});
 			}
+		} 
+	} else {
+		streamFinished=true;
+		if (pendingRequests==0) {
+			jsonfile.writeFile(comp, data, function (err) {
+			})
 		}
-	});
-})
+	}
+});
