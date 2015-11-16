@@ -16,4 +16,3 @@ while read -r downloadLink; do
 		fi
 	fi
 done < "$filename"
-
