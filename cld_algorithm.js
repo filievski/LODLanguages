@@ -44,7 +44,6 @@ parser.parse(stream, function(){
 					var langtag=N3Util.getLiteralLanguage(docobj).substring(0,2).toLowerCase();
 
 					var wordlog = parseInt(math.log(litvalue.split(' ').length, 2), 10);
-					console.log(pendingRequests);
 					if (result && result["languages"]["0"] && result["languages"]["0"]["code"]){
 						var compatible = (result["languages"]["0"]["code"].substring(0,2).toLowerCase()==langtag);
 						if (compatible){

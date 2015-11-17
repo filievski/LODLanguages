@@ -1,6 +1,11 @@
 #! /bin/bash
-        docid="0c77296e83c678a8757669a19894bde6"
+
+	start=`date +%s`
+        docid="b7f7f37bc2573a2e70901b63940fa7ab"
         downloadLink="http://download.lodlaundromat.org/$docid"
         echo $downloadLink
-        curl -q -o - $downloadLink | zcat | grep '"' | nodejs ld_algorithm.js $docid
+        curl -q -o - $downloadLink | zcat | grep '"' | nodejs ld_algorithm.js "test"
+	end=`date +%s`
+	runtime=$((end-start))
+	echo $runtime
 #	echo "done"
