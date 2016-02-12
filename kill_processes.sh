@@ -1,3 +1,3 @@
 pkill frank_documents
 pkill frank
-pkill nodejs
+pkill algorithm_run_f
