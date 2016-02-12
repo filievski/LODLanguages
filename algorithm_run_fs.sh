@@ -3,7 +3,7 @@ searchFor="$1"
 if [ -z $1 ]; then
 	searchFor="."
 fi
-filename="md5s.data"
+#filename="md5s.data"
 while read -r downloadLink; do
 	if [[ $downloadLink == [$searchFor]* ]] ; then
 		#curl -q -m 520 -o /scratch/fii800/download.$searchFor $fullLink;
