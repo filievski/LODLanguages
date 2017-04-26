@@ -30,7 +30,7 @@ var isNLS = function(s){
 }
 
 
-comp = 'ld/' + docid + '.json';
+comp = 'output/ld/' + docid + '.json';
 var DetectorFactory = java.import('com.cybozu.labs.langdetect.DetectorFactory')
 DetectorFactory.loadProfile("langdetect-03-03-2014/profiles.sm", function(err, rslt){
 	data={"tagged":{}, "untagged": {}};

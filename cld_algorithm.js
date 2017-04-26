@@ -27,7 +27,7 @@ var isNLS = function(s){
         }
 }
 
-comp = 'cld/' + docid + '.json';
+comp = 'output/cld/' + docid + '.json';
 data={"tagged":{}, "untagged": {}};
 parser.parse(stream, function(){
 	if (arguments['1']) {

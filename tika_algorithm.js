@@ -27,7 +27,7 @@ var isNLS = function(s){
         }
 }
 
-comp = 'tika/' + docid + '.json';
+comp = 'output/tika/' + docid + '.json';
 data={"tagged":{}, "untagged":{}};
 parser.parse(stream, function(){
 	if (arguments['1']) {

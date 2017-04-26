@@ -29,7 +29,7 @@ var isNLS = function(s){
         }
 }
 
-comp = 'nolib/' + docid + '.json';
+comp = 'output/nolib/' + docid + '.json';
 parser.parse(stream, function(){
 	if (arguments['1']) {
 		var doc = arguments['1'];
