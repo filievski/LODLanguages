@@ -1,5 +1,5 @@
-# LOD Literal Quality
-Code used for the analysis on literal quality for the LOD Laundromat data collection.
+# LOD Literal Quality w.r.t. languages
+Code used for the analysis and the improvements on literal quality for the LOD Laundromat data collection, w.r.t. language tagging.
 
 ### Directory structure
 
@@ -25,4 +25,4 @@ is as simple as running the command:
 
 ### Contact
 
-f.ilievski@vu.nl
+*Filip Ilievski (f.ilievski@vu.nl)*
