@@ -23,3 +23,6 @@ is as simple as running the command:
 
 **Note:** You need to have Frank and the langdetect installed before that in the root directory of this project.
 
+### Contact
+
+f.ilievski@vu.nl
