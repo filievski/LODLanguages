@@ -1,5 +1,4 @@
-# LOD Literal Quality w.r.t. languages
-Code used for the analysis and the improvements on literal quality for the LOD Laundromat data collection, w.r.t. language tagging.
+Analysis and improvements of the language tagging of LOD Laundromat literals, supporting the paper "Literally better: Analyzing and Improving the Quality of Literals".
 
 ### Directory structure
 
