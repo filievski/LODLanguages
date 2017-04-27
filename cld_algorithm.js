@@ -77,12 +77,13 @@ parser.parse(stream, function(){
 				});
 			} else {
 				cld.detect(litvalue, function(err, result) {
-					var wordlog_s = math.min(20, parseInt(math.log(litvalue.split(' ').length, 2), 10)).toString();
-					if (result && result["languages"][0]) {
-						if (data["untagged"][wordlog_s])
-							data["untagged"][wordlog_s]++;
+					//var wordlog_s = math.min(20, parseInt(math.log(litvalue.split(' ').length, 2), 10)).toString();
+					if (result && result["languages"][0] && result["languages"]["0"]["code"]) {
+						var auto_lt = result["languages"]["0"]["code"].substring(0,2).toLowerCase();
+						if (data["untagged"][auto_lt])
+							data["untagged"][auto_lt]++;
 						else
-							data["untagged"][wordlog_s]=1;
+							data["untagged"][auto_lt]=1;
 					}
 					pendingRequests--;
 					if (streamFinished && pendingRequests == 0) {

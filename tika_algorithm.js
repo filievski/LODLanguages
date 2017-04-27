@@ -79,12 +79,11 @@ parser.parse(stream, function(){
 			} else {
 				tika.language(litvalue, function(err, language, reasonablyCertain) {
 					if (!err && language){
-						var wordlog_s = math.min(20, parseInt(math.log(litvalue.split(' ').length, 2), 10)).toString();
-						
-						if (data["untagged"][wordlog_s])
-							data["untagged"][wordlog_s]++;
+//						var wordlog_s = math.min(20, parseInt(math.log(litvalue.split(' ').length, 2), 10)).toString();						
+						if (data["untagged"][language])
+							data["untagged"][language]++;
 						else
-							data["untagged"][wordlog_s]=1;
+							data["untagged"][language]=1;
 					}
 					pendingRequests--;
 					if (streamFinished && pendingRequests == 0) {

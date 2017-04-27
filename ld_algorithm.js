@@ -93,12 +93,13 @@ DetectorFactory.loadProfile("langdetect-03-03-2014/profiles.sm", function(err, r
 						if (err) console.log(err);
 						detector.append(litvalue, function(err, o){
 							detector.detect(function(err, r){
-								var wordlog_s = math.min(20, parseInt(math.log(litvalue.split(' ').length, 2), 10)).toString();
+//								var wordlog_s = math.min(20, parseInt(math.log(litvalue.split(' ').length, 2), 10)).toString();
 								if (!err && r) {
-									if (data["untagged"][wordlog_s])
-										data["untagged"][wordlog_s]++;
+									var auto_lt=r.substring(0,2).toLowerCase();
+									if (data["untagged"][auto_lt])
+										data["untagged"][auto_lt]++;
 									else
-										data["untagged"][wordlog_s]=1;
+										data["untagged"][auto_lt]=1;
 								}
 
 								pendingRequests--;
