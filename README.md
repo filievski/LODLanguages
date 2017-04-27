@@ -25,4 +25,4 @@ is as simple as running the command:
 
 ### Contact
 
-f.ilievski@vu.nl
+*Filip Ilievski (f.ilievski@vu.nl)
