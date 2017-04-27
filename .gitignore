@@ -1,8 +1,7 @@
 Frank/
 *.log
-*.txt
 *.json
 *.csv
-*.data
+*.txt
 old_output/
 node_modules/
