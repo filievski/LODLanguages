@@ -20,11 +20,11 @@ for x in langs:
 
 print(stuff)
 for lib in ["tika", "ld", "cld"]:
-	docs=open("/scratch/fii800/LODObservatory/experiments/second_submission/all_tika_docs.txt")
+	docs=open("/scratch/fii800/LODLanguages/make_paper_tables/second_submission/docs.txt")
 	filenum=0
 	print(lib)
 
-	rootdir="/scratch/fii800/LODObservatory/" + lib
+	rootdir="/scratch/fii800/LODLanguages/output/" + lib
 	os.chdir(rootdir)
 	for f in docs:
 		o=open(f.strip())
@@ -35,8 +35,8 @@ for lib in ["tika", "ld", "cld"]:
 				continue
 			for bs in tagged[lang]:
 				bs2=bs
-				if int(bs2)>14:
-					bs2="14"
+				if int(bs2)>12:
+					bs2="12"
 				if 'c' in tagged[lang][bs]:
 					stuff[lang][bs2][lib]["c"]+=tagged[lang][bs]['c']
 					
@@ -44,7 +44,7 @@ for lib in ["tika", "ld", "cld"]:
 					stuff[lang][bs2][lib]["i"]+=tagged[lang][bs]['i']
 		filenum+=1
 
-w=open("/scratch/fii800/LODObservatory/experiments/second_submission/bigtable.tsv", "w")
+w=open("/scratch/fii800/LODLanguages/make_paper_tables/second_submission/bigtable.tsv", "w")
 for x in langs:
 	b=0
 	towrite=x + ' & '
